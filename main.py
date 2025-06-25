@@ -99,6 +99,23 @@ class System_management:
             for uid, eca in self.eca.items():
                 f.write(f"{uid}," + ",".join(eca) + "\n")
 
+    def view_users(self):
+        print("1.User's info")
+        print("2. Grades")
+        print("3. ECA")
+        choice = input("Choose the number to view: ")
+        if choice=='1':
+            print("Users list")
+            for uid,value in self.users.items():
+                print(f"Id:{uid} \n Name:{value['name']} \n Role:{value['role']} \n Contact:{value['contact']}")
+        elif choice=='2':
+            for uid, marks in self.grades.items():
+                print(f"ID: {uid} - Grades: {marks}")
+        elif choice=='3':
+            for uid ,activities in self.eca.items():
+                print(f"ID:{uid}- ECA:{activities}")
+        else:
+            print("Please choose 1-3")
     def run(self):
         user = self.login()
         while True:
@@ -110,8 +127,8 @@ class System_management:
                     user.add_user(self)
                 if choice=='2':
                     user.delete_user(self)
-                elif choice == "4":
-                    print("View users - To be implemented")
+                elif choice == "3":
+                    user.view_users(self)
                 elif choice == "5":
                     print("Logging out...")
                     break
@@ -139,9 +156,8 @@ class Admin(User):
     def menu(self):
         print("1. Add user")
         print("2. Delete user")
-        print("3. Generate insights")
+        print("3. View Users")
         print("4. Logout")
-
     def add_user(self, system):
         print("----- Add New User -----\n")
         user_id = input("User ID: ").strip()
@@ -167,12 +183,11 @@ class Admin(User):
         system.append_password(user_id, password)
         system.append_grades(user_id, grades)
         system.append_eca(user_id, activities)
-
     def delete_user(self, system):
         user_id=input("Enter the user id:")
         system.delete_user(user_id)
     def view_users(self,system):
-        self
+        system.view_users()
 
 class Student(User):
     def menu(self):
