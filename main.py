@@ -73,6 +73,17 @@ class System_management:
         with open("eca.txt", "a") as f:
             f.write(f"{user_id}," + ",".join(activities) + "\n")
         self.eca[user_id] = activities
+# deleting user info by user id
+    def delete_user(self, user_id):
+        if user_id in self.users:
+            self.users.pop(user_id)
+            self.password.pop(user_id, None)
+            self.grades.pop(user_id, None)
+            self.eca.pop(user_id, None)
+            self.save_all()
+            print(f" User '{user_id}' deleted successfully.")
+        else:
+            print(" User not found.")
 #used in deleting the user details
     def save_all(self):
         with open("user.txt", "w") as f:
@@ -97,10 +108,8 @@ class System_management:
             if user.role == "admin":
                 if choice == "1":
                     user.add_user(self)
-                elif choice == "2":
-                    print("Update user - To be implemented")
-                elif choice == "3":
-                    print("Delete user - To be implemented")
+                if choice=='2':
+                    user.delete_user(self)
                 elif choice == "4":
                     print("View users - To be implemented")
                 elif choice == "5":
@@ -129,10 +138,9 @@ class User:
 class Admin(User):
     def menu(self):
         print("1. Add user")
-        print("2. Update user")
-        print("3. Delete user")
-        print("4. Generate insights")
-        print("5. Logout")
+        print("2. Delete user")
+        print("3. Generate insights")
+        print("4. Logout")
 
     def add_user(self, system):
         print("----- Add New User -----\n")
@@ -160,6 +168,11 @@ class Admin(User):
         system.append_grades(user_id, grades)
         system.append_eca(user_id, activities)
 
+    def delete_user(self, system):
+        user_id=input("Enter the user id:")
+        system.delete_user(user_id)
+    def view_users(self,system):
+        self
 
 class Student(User):
     def menu(self):
