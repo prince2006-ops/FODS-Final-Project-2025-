@@ -2,3 +2,4 @@
 2,Sam Musk,student,9855068933
 3,Joe Root,admin,9865409026
 4,Prashant Basnet,admin,9876056789
+5,Prince,student,98

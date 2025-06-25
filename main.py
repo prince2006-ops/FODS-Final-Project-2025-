@@ -89,15 +89,14 @@ class System_management:
                 f.write(f"{uid}," + ",".join(eca) + "\n")
 
     def run(self):
-        user = self.login()  # Step 1: login returns an Admin or Student object
+        user = self.login()
         while True:
             user.menu()  # Step 2: display menu for that user
             choice = input("Choose option: ").strip()  # Step 3: get choice
-
             # Step 4: match choice to functionality
             if user.role == "admin":
                 if choice == "1":
-                    print("Add user - To be implemented")
+                    user.add_user(self)
                 elif choice == "2":
                     print("Update user - To be implemented")
                 elif choice == "3":
@@ -135,6 +134,33 @@ class Admin(User):
         print("4. Generate insights")
         print("5. Logout")
 
+    def add_user(self, system):
+        print("----- Add New User -----\n")
+        user_id = input("User ID: ").strip()
+        if user_id in system.users:
+            print("User already exists.")
+            return
+
+        name = input("Name: ").strip()
+        role = input("Role : ").strip().lower()
+        if role not in ("admin", "student"):
+            print("Role must be 'admin' or 'student'.")
+            return
+
+        contact = input("Contact: ").strip()
+        password = input("Password: ").strip()
+
+        if role=='student':
+            grades_input = input("Enter grades separated by commas (e.g., 85,90,78): ").strip()
+            grades = [int(g.strip()) for g in grades_input.split(",") if g.strip().isdigit()]
+            eca_input = input("Enter ECA activities separated by commas (e.g., football,robotics): ").strip()
+            activities = [e.strip() for e in eca_input.split(",") if e.strip()]
+        system.append_user(user_id, name, role, contact)
+        system.append_password(user_id, password)
+        system.append_grades(user_id, grades)
+        system.append_eca(user_id, activities)
+
+
 class Student(User):
     def menu(self):
         print("1.View Profile")
@@ -144,6 +170,4 @@ class Student(User):
 
 if __name__ == "__main__":
     system = System_management()
-    user = system.login()
-    if user:
-        user.menu()
+    system.run()
