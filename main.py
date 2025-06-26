@@ -255,9 +255,9 @@ class Admin(User):
         system.append_password(user_id, password)
 
         if role == 'student':
-            grades_input = input("Enter grades separated by commas (e.g., 85,90,78): ").strip()
+            grades_input = input("Enter grades : ").strip()
             grades = [int(g.strip()) for g in grades_input.split(",") if g.strip().isdigit()]
-            eca_input = input("Enter ECA activities separated by commas (e.g., football,robotics): ").strip()
+            eca_input = input("Enter ECA : ").strip()
             activities = [e.strip() for e in eca_input.split(",") if e.strip()]
             system.append_grades(user_id, grades)
             system.append_eca(user_id, activities)
