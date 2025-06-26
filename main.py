@@ -216,7 +216,7 @@ class System_management:
                 else:
                     print("Invalid option. Try again.")
 
-
+#main class
 class User:
     def __init__(self, user_id, name, role, phone):
         self.user_id = user_id
@@ -245,7 +245,7 @@ class Admin(User):
         name = input("Name: ").strip()
         role = input("Role : ").strip().lower()
         if role not in ("admin", "student"):
-            print("Role must be 'admin' or 'student'.")
+            print("Invalid Role!!! Only accepts admin or student")
             return
 
         contact = input("Contact: ").strip()
@@ -256,9 +256,17 @@ class Admin(User):
 
         if role == 'student':
             grades_input = input("Enter grades : ").strip()
-            grades = [int(g.strip()) for g in grades_input.split(",") if g.strip().isdigit()]
+            grades = []
+            for g in grades_input.split(","):
+                if g.strip().isdigit():
+                    grades.append(int(g.strip()))
             eca_input = input("Enter ECA : ").strip()
-            activities = [e.strip() for e in eca_input.split(",") if e.strip()]
+            activities = []
+            for e in eca_input.split(","):
+                value = e.strip()
+                if value:
+                    activities.append(value)
+
             system.append_grades(user_id, grades)
             system.append_eca(user_id, activities)
 
