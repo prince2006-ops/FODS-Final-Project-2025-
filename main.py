@@ -146,6 +146,7 @@ class System_management:
                 print("\n--- GRADES ---")
                 try:
                     grade = self.grades[user_id]
+                    print("FOM,FODS,IT,English,ITF")
                     print(grade)
                 except KeyError:
                     print("No grades on file.")
@@ -171,7 +172,7 @@ class System_management:
 
             elif choice == '2':
                 print("\n--- GRADES LIST ---")
-                print("ID - Grades")
+                print("ID-FOM,FODS,IT,English,ITF")
                 for uid, marks in self.grades.items():
                     print(f"{uid} - {marks}")
                 print()
@@ -204,11 +205,11 @@ class System_management:
                     print("Invalid option. Try again.")
             else:
                 if choice == "1":
-                    print("View profile - To be implemented")
+                    user.view_profile(self)
                 elif choice == "2":
-                    print("View grades - To be implemented")
+                    user.view_grades(self)
                 elif choice == "3":
-                    print("View ECA - To be implemented")
+                    user.view_eca(self)
                 elif choice == "4":
                     print("Logging out...")
                     break
@@ -275,6 +276,33 @@ class Student(User):
         print("2.View Grades")
         print("3.View ECA")
         print("4.Sign out")
+    def view_profile(self,system):
+        self_info=system.users[self.user_id]
+        print("**** Your Details ****")
+        print("\n--- MY PROFILE ---")
+        print(f"ID      : {self.user_id}")
+        print(f"Name    : {self_info['name']}")
+        print(f"Role    : {self_info['role']}")
+        print(f"Contact : {self_info['contact']}\n")
+
+    def view_grades(self, system):
+        print("\n--- MY GRADES ---")
+        try:
+            print("FOM,FODS,IT,English,ITF")
+            g = system.grades[self.user_id]
+            print(g)
+        except KeyError:
+            print("No grades on file.")
+        print()
+
+    def view_eca(self, system):
+        print("\n--- MY ECA ---")
+        try:
+            e = system.eca[self.user_id]
+            print(e)
+        except KeyError:
+            print("No ECA activities on file.")
+        print()
 
 
 if __name__ == "__main__":
