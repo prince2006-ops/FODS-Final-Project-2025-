@@ -1,5 +1,7 @@
+#impoting necessary library
 import os
 import pandas as pd
+import matplotlib.pyplot as plt
 
 # Main class to run the system
 class System_management:
@@ -186,6 +188,97 @@ class System_management:
         else:
             print("Invalid option choice!\n")
 
+    def data_insights(self):
+        print("Why do you want to view?")
+        print("1.Grade trends")
+        print('2. ECA records')
+        print('3. Performance alerts')
+        choice=input("Choose any option:")
+        if choice=='1':
+            subjects=["FOM", "FODS", "IT", "English", "ITF"]
+            try:
+                df=pd.DataFrame.from_dict(self.grades,orient='index',columns=subjects)
+            except ValueError:
+                print("Incomplete data")
+                return
+            avg=df.mean().round(1)
+            print(avg.to_string())
+            plt.figure(figsize=(7,4))
+            avg.plot(kind='bar',color='lightgreen')
+            plt.title('Average grades per Subject')
+            plt.ylabel("Marks")
+            plt.xlabel("Subjects")
+            plt.show()
+        elif choice == '2':
+            eca_counts = {}
+            # count ECA only for students
+            for user_id, activities in self.eca.items():
+                if self.users.get(user_id, {}).get("role") == "student":
+                    eca_counts[user_id] = len(activities)
+
+            grades_avg = {}
+            # calculate average grades only for students
+            for user_id, user_info in self.users.items():
+                if user_info.get("role") != "student":
+                    continue
+                grades = self.grades.get(user_id)
+                if grades is None:
+                    continue
+                avg = sum(grades) / len(grades)
+                grades_avg[user_id] = avg
+
+            data = {}
+            for user_id in self.users:
+                if self.users[user_id].get("role") != "student":
+                    continue
+                eca = eca_counts.get(user_id)
+                mean = grades_avg.get(user_id)
+                if eca is not None and mean is not None:
+                    data[user_id] = [eca, mean]
+
+            if not data:
+                print("Insufficient data to display chart.")
+                return
+
+            df = pd.DataFrame.from_dict(data, orient="index", columns=["ECA Count", "Average Grade"])
+            plt.figure(figsize=(7, 5))
+            plt.plot(df["ECA Count"], df["Average Grade"], marker='o', linestyle='-', color='blue')
+            plt.xlabel("ECA Participation Count")
+            plt.ylabel("Average Grade")
+            plt.title("ECA vs Academic Performance (Students Only)")
+            plt.grid(True, linestyle='--', alpha=0.3)
+            plt.tight_layout()
+            plt.show()
+
+        elif choice == "3":
+            print("\nPerformance Summary: Passed vs Failed")
+            threshold = 40
+            passed = 0
+            failed = 0
+
+            for marks in self.grades.values():
+                if all(mark >= threshold for mark in marks):
+                    passed += 1
+                else:
+                    failed += 1
+
+            labels = ['Passed', 'Failed']
+            counts = [passed, failed]
+            colors = ['green', 'red']
+
+                # Plot
+            plt.figure(figsize=(6, 4))
+            plt.bar(labels, counts, color=colors)
+            plt.title("Number of Passed vs Failed Students")
+            plt.ylabel("Number of Students")
+            plt.ylim(0, max(counts) + 1)
+            plt.grid(axis='y', linestyle='--', alpha=0.3)
+            plt.tight_layout()
+            plt.show()
+
+        else:
+            print("Invalid option.")
+
     def run(self):
         user = self.login()
         while True:
@@ -198,7 +291,9 @@ class System_management:
                     user.delete_user(self)
                 elif choice == "3":
                     user.view_users(self)
-                elif choice == "4":
+                elif choice=='4':
+                    user.data_insights(self)
+                elif choice == "5":
                     print("Logging out...")
                     break
                 else:
@@ -233,7 +328,8 @@ class Admin(User):
         print("\n1. Add user")
         print("2. Delete user")
         print("3. View Users")
-        print("4. Logout")
+        print("4. Data insights")
+        print("5. Logout")
 
     def add_user(self, system):
         print("----- Add New User -----\n")
@@ -277,6 +373,8 @@ class Admin(User):
     def view_users(self, system):
         system.view_users()
 
+    def data_insights(self,system):
+        system.data_insights()
 
 class Student(User):
     def menu(self):

@@ -1,2 +1,3 @@
 user_id,FOM,FODS,IT,English,ITF
 1,80,81,82,83,84
+2,40,30,20,10,0
