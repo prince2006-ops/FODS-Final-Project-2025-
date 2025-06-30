@@ -1,5 +1,7 @@
-#impoting necessary library
+# importing necessary library
 import os
+from random import choice
+
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -12,7 +14,6 @@ class System_management:
         self.password = {}
         self.load_files()
 
-    # Adding the userdata from the files.
     def load_files(self):
         try:
             if os.path.exists("user.txt"):
@@ -32,7 +33,7 @@ class System_management:
 
             if os.path.exists('grades.txt'):
                 with open('grades.txt', 'r') as f:
-                    next(f)  # Skip header
+                    next(f)
                     for line in f:
                         marks = line.strip().split(",")
                         user_id = marks[0]
@@ -48,7 +49,6 @@ class System_management:
         except Exception as e:
             print(f"You have {e} exception")
 
-    # setting up the login system
     def login(self):
         print("-----Login Page-----")
         while True:
@@ -63,7 +63,6 @@ class System_management:
             else:
                 print("Invalid details")
 
-    # adding user data in all the txt files
     def append_user(self, user_id, name, role, contact):
         with open("user.txt", "a") as f:
             f.write(f"{user_id},{name},{role},{contact}\n")
@@ -84,7 +83,6 @@ class System_management:
             f.write(f"{user_id}," + ",".join(activities) + "\n")
         self.eca[user_id] = activities
 
-    # deleting user info by user id
     def delete_user(self, user_id):
         if user_id in self.users:
             self.users.pop(user_id)
@@ -96,7 +94,6 @@ class System_management:
         else:
             print(" User not found.")
 
-    # used in deleting the user details
     def save_all(self):
         with open("user.txt", "w") as f:
             for uid, value in self.users.items():
@@ -105,7 +102,6 @@ class System_management:
             for uid, pwd in self.password.items():
                 f.write(f"{uid},{pwd}\n")
         with open("grades.txt", "w") as f:
-            # Write header for grades file
             f.write("user_id,FOM,FODS,IT,English,ITF\n")
             for uid, grades in self.grades.items():
                 f.write(f"{uid}," + ",".join(map(str, grades)) + "\n")
@@ -113,7 +109,6 @@ class System_management:
             for uid, eca in self.eca.items():
                 f.write(f"{uid}," + ",".join(eca) + "\n")
 
-    # Viewing users with options for specific or all, and category selection
     def view_users(self):
         print("\n1. User's info")
         print("2. Grades")
@@ -136,7 +131,7 @@ class System_management:
                 print("User ID not found!\n")
                 return
 
-            if choice == '1':  # Basic info
+            if choice == '1':
                 u = self.users[user_id]
                 print(f"\n--- USER INFO ---")
                 print(f"ID      : {user_id}")
@@ -144,7 +139,7 @@ class System_management:
                 print(f"Role    : {u['role']}")
                 print(f"Contact : {u['contact']}\n")
 
-            elif choice == '2':  # Grades
+            elif choice == '2':
                 print("\n--- GRADES ---")
                 try:
                     grade = self.grades[user_id]
@@ -154,7 +149,7 @@ class System_management:
                     print("No grades on file.")
                 print()
 
-            elif choice == '3':  # ECA
+            elif choice == '3':
                 print("\n--- ECA ---")
                 try:
                     eca = self.eca[user_id]
@@ -193,31 +188,31 @@ class System_management:
         print("1.Grade trends")
         print('2. ECA records')
         print('3. Performance alerts')
-        choice=input("Choose any option:")
-        if choice=='1':
-            subjects=["FOM", "FODS", "IT", "English", "ITF"]
+        choice = input("Choose any option:")
+
+        if choice == '1':
+            subjects = ["FOM", "FODS", "IT", "English", "ITF"]
             try:
-                df=pd.DataFrame.from_dict(self.grades,orient='index',columns=subjects)
+                df = pd.DataFrame.from_dict(self.grades, orient='index', columns=subjects)
             except ValueError:
                 print("Incomplete data")
                 return
-            avg=df.mean().round(1)
+            avg = df.mean().round(1)
             print(avg.to_string())
-            plt.figure(figsize=(7,4))
-            avg.plot(kind='bar',color='lightgreen')
+            plt.figure(figsize=(7, 4))
+            avg.plot(kind='bar', color='lightgreen')
             plt.title('Average grades per Subject')
             plt.ylabel("Marks")
             plt.xlabel("Subjects")
             plt.show()
+
         elif choice == '2':
             eca_counts = {}
-            # count ECA only for students
             for user_id, activities in self.eca.items():
                 if self.users.get(user_id, {}).get("role") == "student":
                     eca_counts[user_id] = len(activities)
 
             grades_avg = {}
-            # calculate average grades only for students
             for user_id, user_info in self.users.items():
                 if user_info.get("role") != "student":
                     continue
@@ -266,7 +261,6 @@ class System_management:
             counts = [passed, failed]
             colors = ['green', 'red']
 
-                # Plot
             plt.figure(figsize=(6, 4))
             plt.bar(labels, counts, color=colors)
             plt.title("Number of Passed vs Failed Students")
@@ -275,25 +269,26 @@ class System_management:
             plt.grid(axis='y', linestyle='--', alpha=0.3)
             plt.tight_layout()
             plt.show()
-
         else:
             print("Invalid option.")
 
     def run(self):
         user = self.login()
         while True:
-            user.menu()  # display menu for that user
+            user.menu()
             choice = input("Choose option: ").strip()
             if user.role == "admin":
                 if choice == "1":
                     user.add_user(self)
-                elif choice == "2":
-                    user.delete_user(self)
+                elif choice=="2":
+                    user.update_user(self)
                 elif choice == "3":
+                    user.delete_user(self)
+                elif choice == "4":
                     user.view_users(self)
-                elif choice=='4':
-                    user.data_insights(self)
                 elif choice == "5":
+                    user.data_insights(self)
+                elif choice == "6":
                     print("Logging out...")
                     break
                 else:
@@ -310,9 +305,8 @@ class System_management:
                     break
                 else:
                     print("Invalid option. Try again.")
-
-#main class
-class User:
+# Base Class named Person
+class Person:
     def __init__(self, user_id, name, role, phone):
         self.user_id = user_id
         self.name = name
@@ -321,15 +315,15 @@ class User:
 
     def menu(self):
         pass
-
-
-class Admin(User):
+#Sub-class for Admin
+class Admin(Person):
     def menu(self):
         print("\n1. Add user")
-        print("2. Delete user")
-        print("3. View Users")
-        print("4. Data insights")
-        print("5. Logout")
+        print("2.Update user")
+        print("3. Delete user")
+        print("4. View Users")
+        print("5. Data insights")
+        print("6. Logout")
 
     def add_user(self, system):
         print("----- Add New User -----\n")
@@ -352,19 +346,53 @@ class Admin(User):
 
         if role == 'student':
             grades_input = input("Enter grades : ").strip()
-            grades = []
-            for g in grades_input.split(","):
-                if g.strip().isdigit():
-                    grades.append(int(g.strip()))
+            grades = [int(g.strip()) for g in grades_input.split(",") if g.strip().isdigit()]
             eca_input = input("Enter ECA : ").strip()
-            activities = []
-            for e in eca_input.split(","):
-                value = e.strip()
-                if value:
-                    activities.append(value)
-
+            activities = [e.strip() for e in eca_input.split(",") if e.strip()]
             system.append_grades(user_id, grades)
             system.append_eca(user_id, activities)
+
+    def update_user(self,system):
+        print("----Update User----")
+        user_id=input("Enter the user id to update:").strip()
+        if user_id not in system.users or system.users[user_id]["role"]!='student':
+            print("Invalid ID!")
+        print("\nWhat do you like to update: ")
+        print("1.Student info")
+        print("2.Grades")
+        print("3.ECA")
+        choice=input("Enter your choice:")
+        if choice=="1":
+            name=input("Update the name or leave it empty").strip()
+            contact=input("Update the contact or leave it empty").strip()
+            password=input("Update the password or leave it empty").strip()
+            if name:
+                system.users[user_id]['name']=name
+            if contact:
+                system.users[user_id]['contact']=contact
+            if password:
+                system.users[user_id]['password']=password
+            system.save_all()
+        elif choice == "2":
+            grades_input = input("Enter new grades: ").strip()
+            try:
+                grades = list(map(int, grades_input.split(",")))
+                system.grades[user_id] = grades
+                system.save_all()
+            except Exception as e:
+                print("Error updating grades:", e)
+        elif choice == "3":
+            eca_input = input("Enter new ECA activities: ").strip()
+            try:
+                activities = list(map(str.strip, eca_input.split(",")))
+                system.eca[user_id] = activities
+                system.save_all()
+                print("ECA updated successfully.")
+            except Exception as e:
+                print("Error updating ECA:", e)
+
+        else:
+            print("Invalid option.")
 
     def delete_user(self, system):
         user_id = input("Enter the user id:").strip()
@@ -373,17 +401,18 @@ class Admin(User):
     def view_users(self, system):
         system.view_users()
 
-    def data_insights(self,system):
+    def data_insights(self, system):
         system.data_insights()
-
-class Student(User):
+#Sub-class for student
+class Student(Person):
     def menu(self):
         print("\n1.View Profile")
         print("2.View Grades")
         print("3.View ECA")
         print("4.Sign out")
-    def view_profile(self,system):
-        self_info=system.users[self.user_id]
+
+    def view_profile(self, system):
+        self_info = system.users[self.user_id]
         print("**** Your Details ****")
         print("\n--- MY PROFILE ---")
         print(f"ID      : {self.user_id}")
@@ -409,7 +438,6 @@ class Student(User):
         except KeyError:
             print("No ECA activities on file.")
         print()
-
 
 if __name__ == "__main__":
     system = System_management()
