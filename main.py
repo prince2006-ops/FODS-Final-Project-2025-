@@ -1,7 +1,5 @@
 # importing necessary library
 import os
-from random import choice
-
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -13,7 +11,7 @@ class System_management:
         self.grades = {}
         self.password = {}
         self.load_files()
-
+#loading all the data from the txt file.
     def load_files(self):
         try:
             if os.path.exists("user.txt"):
@@ -48,7 +46,7 @@ class System_management:
                         self.eca[user_id] = activities
         except Exception as e:
             print(f"You have {e} exception")
-
+# Validates the login and returns the class accordingly
     def login(self):
         print("-----Login Page-----")
         while True:
@@ -62,27 +60,28 @@ class System_management:
                     return Student(u_id, detail["name"], detail["role"], detail["contact"])
             else:
                 print("Invalid details")
-
+# helps to append the file when admin adds users.
+    # appends user info
     def append_user(self, user_id, name, role, contact):
         with open("user.txt", "a") as f:
             f.write(f"{user_id},{name},{role},{contact}\n")
         self.users[user_id] = {"name": name, "role": role, "contact": contact}
-
+    # appends user password
     def append_password(self, user_id, password):
         with open("password.txt", "a") as f:
             f.write(f"{user_id},{password}\n")
         self.password[user_id] = password
-
+    # appends user grades
     def append_grades(self, user_id, grades):
         with open("grades.txt", "a") as f:
             f.write(f"{user_id}," + ",".join(map(str, grades)) + "\n")
         self.grades[user_id] = grades
-
+    # appends user eca
     def append_eca(self, user_id, activities):
         with open("eca.txt", "a") as f:
             f.write(f"{user_id}," + ",".join(activities) + "\n")
         self.eca[user_id] = activities
-
+# deletes the data of the file.
     def delete_user(self, user_id):
         if user_id in self.users:
             self.users.pop(user_id)
@@ -93,7 +92,7 @@ class System_management:
             print(f" User '{user_id}' deleted successfully.")
         else:
             print(" User not found.")
-
+#saves the data  in file after updating and deleting from the file.
     def save_all(self):
         with open("user.txt", "w") as f:
             for uid, value in self.users.items():
@@ -108,7 +107,7 @@ class System_management:
         with open("eca.txt", "w") as f:
             for uid, eca in self.eca.items():
                 f.write(f"{uid}," + ",".join(eca) + "\n")
-
+# function to view users to admin.
     def view_users(self):
         print("\n1. User's info")
         print("2. Grades")
@@ -182,7 +181,7 @@ class System_management:
 
         else:
             print("Invalid option choice!\n")
-
+# provides data insights to admin.
     def data_insights(self):
         print("Why do you want to view?")
         print("1.Grade trends")
@@ -271,23 +270,23 @@ class System_management:
             plt.show()
         else:
             print("Invalid option.")
-
+# main function of the program
     def run(self):
-        user = self.login()
+        person = self.login()
         while True:
-            user.menu()
+            person.menu()
             choice = input("Choose option: ").strip()
-            if user.role == "admin":
+            if person.role == "admin":
                 if choice == "1":
-                    user.add_user(self)
+                    person.add_user(self)
                 elif choice=="2":
-                    user.update_user(self)
+                    person.update_user(self)
                 elif choice == "3":
-                    user.delete_user(self)
+                    person.delete_user(self)
                 elif choice == "4":
-                    user.view_users(self)
+                    person.view_users(self)
                 elif choice == "5":
-                    user.data_insights(self)
+                    person.data_insights(self)
                 elif choice == "6":
                     print("Logging out...")
                     break
@@ -295,16 +294,19 @@ class System_management:
                     print("Invalid option. Try again.")
             else:
                 if choice == "1":
-                    user.view_profile(self)
+                    person.view_profile(self)
                 elif choice == "2":
-                    user.view_grades(self)
+                    person.view_grades(self)
                 elif choice == "3":
-                    user.view_eca(self)
+                    person.view_eca(self)
                 elif choice == "4":
                     print("Logging out...")
                     break
                 else:
                     print("Invalid option. Try again.")
+
+
+
 # Base Class named Person
 class Person:
     def __init__(self, user_id, name, role, phone):
@@ -315,16 +317,18 @@ class Person:
 
     def menu(self):
         pass
-#Sub-class for Admin
+
+
+#Class for Admin from the base class Person
 class Admin(Person):
     def menu(self):
         print("\n1. Add user")
-        print("2.Update user")
+        print("2. Update user")
         print("3. Delete user")
         print("4. View Users")
         print("5. Data insights")
         print("6. Logout")
-
+# adding user in the txt file.
     def add_user(self, system):
         print("----- Add New User -----\n")
         user_id = input("User ID: ").strip()
@@ -346,12 +350,20 @@ class Admin(Person):
 
         if role == 'student':
             grades_input = input("Enter grades : ").strip()
-            grades = [int(g.strip()) for g in grades_input.split(",") if g.strip().isdigit()]
+            grades = []
+            for g in grades_input.split(","):
+                g = g.strip()
+                if g.isdigit():
+                    grades.append(int(g))
             eca_input = input("Enter ECA : ").strip()
-            activities = [e.strip() for e in eca_input.split(",") if e.strip()]
+            activities = []
+            for e in eca_input.split(','):
+                e=e.strip()
+                if e:
+                    activities.append(e)
             system.append_grades(user_id, grades)
             system.append_eca(user_id, activities)
-
+# updating the user in the file.
     def update_user(self,system):
         print("----Update User----")
         user_id=input("Enter the user id to update:").strip()
@@ -393,24 +405,26 @@ class Admin(Person):
 
         else:
             print("Invalid option.")
-
+#deleting the user from the file.
     def delete_user(self, system):
         user_id = input("Enter the user id:").strip()
         system.delete_user(user_id)
-
+#viewing the user from the file.
     def view_users(self, system):
         system.view_users()
-
+#providing the data insights.
     def data_insights(self, system):
         system.data_insights()
-#Sub-class for student
+
+
+#Class for student from the base class Person
 class Student(Person):
     def menu(self):
         print("\n1.View Profile")
         print("2.View Grades")
         print("3.View ECA")
         print("4.Sign out")
-
+# viewing info of the students
     def view_profile(self, system):
         self_info = system.users[self.user_id]
         print("**** Your Details ****")
@@ -420,6 +434,7 @@ class Student(Person):
         print(f"Role    : {self_info['role']}")
         print(f"Contact : {self_info['contact']}\n")
 
+# viewing grades of the students
     def view_grades(self, system):
         print("\n--- MY GRADES ---")
         try:
@@ -429,7 +444,7 @@ class Student(Person):
         except KeyError:
             print("No grades on file.")
         print()
-
+#viewing ECA of the students
     def view_eca(self, system):
         print("\n--- MY ECA ---")
         try:
@@ -439,6 +454,8 @@ class Student(Person):
             print("No ECA activities on file.")
         print()
 
+
+# Main program
 if __name__ == "__main__":
     system = System_management()
     system.run()
